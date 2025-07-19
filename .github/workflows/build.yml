@@ -1,0 +1,19 @@
+name: Flujo de Integración Continua
+on: 
+  push:
+    tags:
+      - '*'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    # Importante configurar como secreto del repositorio de GitHub el id y secreto para la API de spotify
+    env: 
+      SPOTIFY_ID: ${{ secrets.SPOTIFY_ID }}
+      SPOTIFY_SECRET: ${{ secrets.SPOTIFY_SECRET }}
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Docker
+        run: docker build .

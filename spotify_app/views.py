@@ -150,7 +150,7 @@ class UserEmailAPIView(APIView):
             user = Users.objects.get(pk=email)
             return Response(UserSerializer(user).data, status=status.HTTP_302_FOUND)
         except Users.DoesNotExist:
-            return Response({"error": f'No existe el usuario ${email}'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f'No existe el usuario {email}'}, status=status.HTTP_404_NOT_FOUND)
     
     def delete(self, request, email):
         """
@@ -161,7 +161,7 @@ class UserEmailAPIView(APIView):
             user.delete()
             return Response({"message": "Usuario eliminado"}, status=status.HTTP_204_NO_CONTENT)
         except Users.DoesNotExist:
-            return Response({"error": f'No existe el usuario ${email}'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f'No existe el usuario {email}'}, status=status.HTTP_404_NOT_FOUND)
         
     def put(self, request, email):
         """
@@ -170,7 +170,7 @@ class UserEmailAPIView(APIView):
         try:
             user = Users.objects.get(pk=email)
         except Users.DoesNotExist:
-            return Response({"error": f'No existe el usuario ${email}'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f'No existe el usuario {email}'}, status=status.HTTP_404_NOT_FOUND)
         
         serializer = UserSerializer(user, data=request.data, partial = True) 
         if serializer.is_valid():
@@ -256,7 +256,7 @@ class UserSpotifyAPIView(APIView):
         try:
             user = Users.objects.get(pk=email)
         except Users.DoesNotExist:
-            return Response({"error": f'No existe el usuario ${email}'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f'No existe el usuario {email}'}, status=status.HTTP_404_NOT_FOUND)
         
         if type != 'songs' and type != 'artists':
             Response({"error": f"Unexpected error {type}"}, status=status.HTTP_400_BAD_REQUEST)
@@ -267,13 +267,13 @@ class UserSpotifyAPIView(APIView):
             # Se comprueba si la canción existe en Spotify y si es así se añade a la base de datos
             so = get_data('songs', data['code'])
             if 'song' not in so:
-                return Response({'message': f'Canción con id ${data['code']} no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'message': f'Canción con id {data["code"]} no encontrada'}, status=status.HTTP_404_NOT_FOUND)
             serializer = SongObjectSerializer(data={'email': email, 'code': data['code']})
         else:
             # Se comprueba si el artista existe en Spotify y si es así se añade a la base de datos
             so = get_data('artists', data['code'])
             if 'artist' not in so:
-                return Response({'message': f'Artista con id ${data['code']} no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'message': f'Artista con id {data["code"]} no encontrado'}, status=status.HTTP_404_NOT_FOUND)
             serializer = ArtistObjectSerializer(data={'email': email, 'code': data['code']})
 
         # Se comprueba que el objeto creado con el serializador es valido
@@ -291,7 +291,7 @@ class UserSpotifyAPIView(APIView):
         try:
             user = Users.objects.get(pk=email)
         except Users.DoesNotExist:
-            return Response({"error": f'No existe el usuario ${email}'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f'No existe el usuario {email}'}, status=status.HTTP_404_NOT_FOUND)
         serializer = UserSerializer(user)
 
         if type == 'songs':
@@ -299,7 +299,7 @@ class UserSpotifyAPIView(APIView):
             for song in serializer.data['songs']:
                 # Se utiliza la función get_song para obtener la información de las canciones
                 new_song = get_data('songs', song['code'])
-                if new_song['song']:
+                if 'song' in new_song:
                     song_list.append(new_song['song'])
             return Response({'song list': song_list})
         elif type == 'artists':
@@ -307,7 +307,7 @@ class UserSpotifyAPIView(APIView):
             for artist in serializer.data['artists']:
                 # Se reutiliza la función get_artist para obtener la información de los artistas
                 new_artist = get_data('artists', artist['code'])
-                if new_artist['artist']:
+                if 'artist' in new_artist:
                     artist_list.append(new_artist['artist'])
             return Response({'artist list': artist_list})
         else:
@@ -321,7 +321,7 @@ class UserSpotifyAPIView(APIView):
         try:
             user = Users.objects.get(pk=email)
         except Users.DoesNotExist:
-            return Response({"error": f'No existe el usuario ${email}'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f'No existe el usuario {email}'}, status=status.HTTP_404_NOT_FOUND)
         
         data = request.data
  
@@ -330,7 +330,7 @@ class UserSpotifyAPIView(APIView):
             try:
                 item = Songs.objects.get(code=data['code'])
             except Songs.DoesNotExist:
-                return Response({"error": f'No existe la cancion ${data['code']} en el listado del usuario ${email}'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": f'No existe la cancion {data["code"]} en el listado del usuario {email}'}, status=status.HTTP_404_NOT_FOUND)
             except Songs.MultipleObjectsReturned:
                 # Esto no deberia pasar, ya que se ha establecido que no puede repetirse un par codigo usuario
                 return Response({"error": 'Más de un elemento encontrado'}, status=status.HTTP_409_CONFLICT)
@@ -339,7 +339,7 @@ class UserSpotifyAPIView(APIView):
             try:
                 item = Artists.objects.get(code=data['code'])
             except Artists.DoesNotExist:
-                return Response({"error": f'No existe la cancion ${data['code']} en el listado del usuario ${email}'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": f'No existe la cancion {data["code"]} en el listado del usuario {email}'}, status=status.HTTP_404_NOT_FOUND)
             except Artists.MultipleObjectsReturned:
                 # Esto no deberia pasar, ya que se ha establecido que no puede repetirse un par codigo usuario
                 return Response({"error": 'Más de un elemento encontrado'}, status=status.HTTP_409_CONFLICT)
